@@ -45,15 +45,44 @@ app.post('/users', async (req, res) => {
 });
 app.post('/login',async(req, res) => {
     const { name, password } = req.body;
-    const getUserQuery = `SELECT * FROM users WHERE name = $1 AND password = $2`;
+    const getLoginQuery = `SELECT * FROM users WHERE name = $1 AND password = $2`;
     try{
-        const result = await db.query(getUserQuery, [
+        const result = await db.query(getLoginQuery, [
             name,
             password
         ]);
         res.status(200).json(result.rows[0]);
     }
     catch (error) {
+        res.status(500).json({ error: 'Failed to login' });
+    }
+});
+app.patch('/profile', async(req, res) => {
+    const { username, password } = req.body;
+    const loginQuery = `SELECT * FROM users WHERE username = $1 AND password = $2`;
+    try{
+        const result = await db.query(loginQuery, [
+            username,password
+        ]);
+        res.status(200).json(result.rows[0]);
+   
+ 
+
+    const { username, email, age } = req.body;
+    const updateUserQuery = `UPDATE users SET email = $1, age = $2 WHERE username = $3 RETURNING *`;
+    try
+    {
+        const result= await db.query(updateUserQuery, [
+            email, age, username
+
+        ]);
+        res.status(200).json(result.rows[0]);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to update user profile' });
+    }
+}
+catch (error) {
         res.status(500).json({ error: 'Failed to login' });
     }
 });
