@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import axios from "axios";
 function UserForm() {
   const [name, setName] = useState("");
   const [registrationNumber, setRegistrationNumber] = useState("");
@@ -7,31 +7,36 @@ function UserForm() {
   const [password, setPassword] = useState("");
   const [age, setAge] = useState("");
   const [message, setMessage] = useState("");
+  const [page, setPage] = useState("welcome");
 
-  const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!name || !registrationNumber || !email || !password || !age) {
       setMessage("Please fill all the fields.");
       return;
     }
 
-    setMessage("Registration Successful!");
+    try {
+      const response = await axios.post("/api/user", {
+        username: name,
+        registration_no: registrationNumber,
+        email: email,
+        password: password,
+        age: parseInt(age),
+      });
 
-    console.log({
-      name,
-      registrationNumber,
-      email,
-      password,
-      age,
-    });
+      console.log("User created:", response.data);
+      setMessage("Registration Successful!");
+      setName("");
+      setRegistrationNumber("");
+      setEmail("");
+      setPassword("");
+      setAge("");
 
-    // Clear form
-    setName("");
-    setRegistrationNumber("");
-    setEmail("");
-    setPassword("");
-    setAge("");
+    } catch (error) {
+      console.error(error);
+      setMessage("Registration failed. Please try again.");
+    }
   };
 
   return (
@@ -98,7 +103,39 @@ function UserForm() {
 
         </form>
       </div>
+      <div>
+    {page === "welcome" && (
+      <div>
+        <h1>Welcome!</h1>
+        <button onClick={() => setPage("login")}>Login</button>
+        <button onClick={() => setPage("register")}>Register</button>
+      </div>
+    )}
+
+    {page === "register" && (
+      <div>
+        {/* your existing registration form goes here */}
+      </div>
+    )}
+
+    {page === "login" && (
+      <div>
+        {/* login form goes here */}
+        {/* on success → setUser(response.data) then setPage("profile") */}
+      </div>
+    )}
+
+    {page === "profile" && (
+      <div>
+        <h2>Welcome, {user?.username}</h2>
+        <p>Email: {user?.email}</p>
+        <p>Age: {user?.age}</p>
+        <button onClick={() => setPage("welcome")}>Logout</button>
+      </div>
+    )}
+  </div>
     </div>
+    
   );
 }
 
