@@ -58,22 +58,23 @@ app.post('/login',async(req, res) => {
     }
 });
 app.patch('/profile', async(req, res) => {
-    const { username, password } = req.body;
-    const loginQuery = `SELECT * FROM users WHERE username = $1 AND password = $2`;
+    const { name, password } = req.body;
+    const loginQuery = `SELECT * FROM users WHERE name = $1 AND password = $2`;
     try{
         const result = await db.query(loginQuery, [
-            username,password
+            name,
+            password
         ]);
         res.status(200).json(result.rows[0]);
    
  
 
-    const { username, email, age } = req.body;
-    const updateUserQuery = `UPDATE users SET email = $1, age = $2 WHERE username = $3 RETURNING *`;
+    const { name, email, age } = req.body;
+    const updateUserQuery = `UPDATE users SET email = $1, age = $2 WHERE name = $3 RETURNING *`;
     try
     {
         const result= await db.query(updateUserQuery, [
-            email, age, username
+            email, age, name
 
         ]);
         res.status(200).json(result.rows[0]);
