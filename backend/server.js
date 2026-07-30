@@ -1,5 +1,12 @@
+require("dotenv").config();
+const cors = require("cors");
+const db = require("../models/connections.js");
 const express = require("express");
+const { initDatabase } = require("../controllers/initDb.js");
+initDatabase();
 const app = express();
+app.use(cors());
+app.use(express.json());
 app.get("/", (req,res) => {
      res.status(200).json({
         status: 'success',
