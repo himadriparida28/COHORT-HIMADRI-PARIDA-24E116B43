@@ -86,6 +86,22 @@ catch (error) {
         res.status(500).json({ error: 'Failed to login' });
     }
 });
+app.delete("/profile", async (req, res) => {
+    const getuser = req.user.registration_number;
+    const deleteUserQuery = `DELETE FROM users WHERE registration_number = $1`;
+    try {
+        await db.query(deleteUserQuery, [getuser]);
+        res.status(200).json({
+            status: "success",
+            message: "User deleted successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "failed",
+            message: "Something went wrong"
+        });
+    }
+});
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
