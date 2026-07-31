@@ -10,8 +10,8 @@ pool.connect((err, client, release) => {
     console.log("Successfully Connected to the Database");
 
     release(); 
-
+});
 module.exports = {
     client: () => pool.connect(),  
     query: (text, params) => pool.query(text, params),
-}});
+}

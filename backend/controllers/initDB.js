@@ -1,7 +1,7 @@
-const {query} = require('../models/connection.js');
+const {query} = require('../models/connections.js');
 const initDatabase=async()=>{
     const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS users_new (
             name VARCHAR(100) UNIQUE NOT NULL,
             password VARCHAR(255) CHECK(LENGTH(password) >= 8) NOT NULL,
             email VARCHAR(255) UNIQUE NOT NULL,
