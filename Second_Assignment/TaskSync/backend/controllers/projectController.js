@@ -42,42 +42,69 @@ const createProject = async (req, res) => {
     }
 };
 const getMyProjects = async (req, res) => {
+
     try {
-        const memberQuery = ` SELECT project_id, role  FROM project_members  WHERE user_id = $1;
+
+        const memberQuery = `
+            SELECT project_id, role FROM project_members WHERE user_id = $1;
         `;
-        const memberResult = await db.query(
-            memberQuery,
-            [req.user.id]
-        );
+
+        const memberResult = await db.query(memberQuery, [req.user.id]);
+
         const projects = [];
+
         for (const member of memberResult.rows) {
+
             const projectQuery = `
                 SELECT id, name, description FROM projects WHERE id = $1;
             `;
-            const projectResult = await db.query(
-                projectQuery,
-                [member.project_id]
-            );
+            const projectResult = await db.query(projectQuery, [member.project_id]);
+
+            // get task progress
+            const progressQuery = `
+                SELECT
+                    COUNT(*) as total_tasks,
+                    COUNT(CASE WHEN status = 'done' THEN 1 END) as done_tasks
+                FROM tasks
+                WHERE project_id = $1;
+            `;
+            const progressResult = await db.query(progressQuery, [member.project_id]);
+
             if (projectResult.rowCount > 0) {
+
+                const total    = parseInt(progressResult.rows[0].total_tasks);
+                const done     = parseInt(progressResult.rows[0].done_tasks);
+                const progress = total > 0 ? Math.round((done / total) * 100) : 0;
+
                 projects.push({
-                    id: projectResult.rows[0].id,
-                    name: projectResult.rows[0].name,
+                    id:          projectResult.rows[0].id,
+                    name:        projectResult.rows[0].name,
                     description: projectResult.rows[0].description,
-                    role: member.role
+                    role:        member.role,
+                    progress:    progress,
+                    total_tasks: total,
+                    done_tasks:  done
                 });
+
             }
+
         }
+
         return res.status(200).json({
-            status: "success",
+            status: 'success',
             totalProjects: projects.length,
             projects
         });
+
     } catch (error) {
+
         return res.status(500).json({
-            status: "failed",
+            status: 'failed',
             message: error.message
         });
+
     }
+
 };
 const inviteMember = async (req, res) => {
     const { email } = req.body;

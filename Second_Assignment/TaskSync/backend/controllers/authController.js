@@ -155,9 +155,97 @@ const getProfile = async (req, res) => {
         });
     }
 };
+const forgotPassword = async (req, res) => {
+
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+        return res.status(400).json({
+            status: 'failed',
+            message: 'Email and new password are required'
+        });
+    }
+
+    try {
+
+        const userExists = await db.query(
+            'SELECT * FROM users_2 WHERE email = $1',
+            [email]
+        );
+
+        if (userExists.rowCount === 0) {
+            return res.status(404).json({
+                status: 'failed',
+                message: 'User not found'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await db.query(
+            'UPDATE users_2 SET password = $1 WHERE email = $2',
+            [hashedPassword, email]
+        );
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Password updated successfully'
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            status: 'failed',
+            message: error.message
+        });
+
+    }
+
+};
+
+const updateProfile = async (req, res) => {
+
+    const { username } = req.body;
+
+    if (!username) {
+        return res.status(400).json({
+            status: 'failed',
+            message: 'Username is required'
+        });
+    }
+
+    try {
+
+        const updateQuery = `
+            UPDATE users_2
+            SET username = $1
+            WHERE id = $2
+            RETURNING id, username, email;
+        `;
+
+        const result = await db.query(updateQuery, [username, req.user.id]);
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Profile updated successfully',
+            user: result.rows[0]
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            status: 'failed',
+            message: error.message
+        });
+
+    }
+
+};
 module.exports = {
     register,
     login,
     logout,
-    getProfile
+    getProfile,
+    forgotPassword,
+    updateProfile
 };

@@ -6,6 +6,7 @@ const {projectMemberMiddleware} = require("../middlewares/projectMemberMiddlewar
 taskRoute
 .get("/projects/:projectId/tasks", authMiddleware, projectMemberMiddleware, getTasks)
 .post("/projects/:projectId/tasks", authMiddleware, projectMemberMiddleware, createTask)
+.get('/projects/:projectId/activity', authMiddleware, projectMemberMiddleware, getActivity)
 .put("/tasks/:taskId", authMiddleware, updateTask)
 
 module.exports = {taskRoute};

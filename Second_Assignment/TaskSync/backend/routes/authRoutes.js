@@ -6,4 +6,6 @@ authRoute
 .post("/login", login)
 .post("/logout", logout)
 .get("/profile", authMiddleware, getProfile)
+.patch('/forgot-password', forgotPassword)
+.patch('/profile', authMiddleware, updateProfile)
 module.exports = {authRoute};
