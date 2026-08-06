@@ -6,6 +6,8 @@ const { initDatabase } = require("./controllers/initDb");
 const db = require('./models/connection.js');
 const { authRoute } = require("./routes/authRoute");
 const PORT = process.env.PORT || 3000;
+const { projectRoute } = require("./routes/projectRoutes");
+const { taskRoute} = require("./routes/taskRoutes")
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -20,3 +22,5 @@ app.use("/api/auth", authRoute);
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+app.use("/api/projects", projectRoute);
+app.use("/api", taskRoute);
